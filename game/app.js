@@ -31,7 +31,7 @@ class word{
             heart -= 1;
             document.getElementById("heart-container").removeChild(document.getElementById("heart-container").children[0]);
         }
-        else if(this.y > this.canvas.height - 75){
+        else if(this.y > this.canvas.height - 75 && this.speed != 0){
             this.speed = 0.2
             this.isShaking = true
             this.x += (Math.random() - 0.5) * 2;
@@ -76,13 +76,32 @@ function putUnknownWords(arr){
 
 // Rastgele bir kelime seçme fonksiyonu
 function getRandomWord(ctx,canvas) {
+    console.log("posjdfoids");
     if (wordsData.length === 0) {
         console.log("Veri yüklenmedi!");
         return null;
     }
     const randomIndex = Math.floor(Math.random() * wordsData.length);
-    
-    return new word(wordsData[randomIndex],150 + Math.random() * 650,50 + Math.random() * 250,0.1 + Math.random() * 0.6,ctx,canvas);
+
+    let x = 150 + Math.random() * 650;
+    let y = 50 + Math.random() * 250;
+    let speed = 0.4;
+    while(true){
+        let isChanged = false
+        for (let i = 0; i < texts.length; i++) {
+            const word = texts[i];
+            if( y + 55 > word.y && y - 55 < word.y && x - 200 < word.x && x + 200 > word.x){
+                y = 50 + Math.random() * 250;
+                isChanged = true;
+                break;
+            }
+        }
+
+        if(!isChanged){
+            break;
+        }
+    }
+    return new word(wordsData[randomIndex],x,y,speed,ctx,canvas);
 }
 let texts = [] 
 let unknownwords = [];
@@ -121,8 +140,11 @@ restartBtn.addEventListener("click", () => {
     document.getElementById("point").textContent = "0";
 
     document.getElementById("modal-gameover").style.display = "none"
-    heart = 5
-    texts = [getRandomWord(ctx,canvas),getRandomWord(ctx,canvas),getRandomWord(ctx,canvas)]
+    heart = 5;
+    texts = []
+    texts.push(getRandomWord(ctx,canvas));
+    texts.push(getRandomWord(ctx,canvas));
+    texts.push(getRandomWord(ctx,canvas));
     unknownwords = []
 });
 
@@ -130,7 +152,9 @@ async function main(ctx,canvas) {
     await loadWords();  
     const randomWord = getRandomWord(ctx,canvas);  
     console.log("Rastgele kelime:", randomWord);
-    texts.push(randomWord,getRandomWord(ctx,canvas),getRandomWord(ctx,canvas));
+    texts.push(randomWord);
+    texts.push(getRandomWord(ctx,canvas));
+    texts.push(getRandomWord(ctx,canvas));
 }
 
 var canvas = document.getElementById('gameCanvas');
